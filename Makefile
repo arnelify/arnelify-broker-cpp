@@ -7,30 +7,36 @@ ENGINE_WATCH = clang++
 ENGINE_FLAGS = -std=c++2b
 
 # PATH
-PATH_BIN = $(CURDIR)/build/index.so
-PATH_SRC = $(CURDIR)/src/cpp/ffi.cpp
-PATH_TESTS_BIN = $(CURDIR)/src/tests/bin/index
-PATH_TESTS_SRC = $(CURDIR)/src/tests/index.cpp
+PATH_TEST_BIN = $(CURDIR)/build/main
+PATH_TEST_SRC_RPC = $(CURDIR)/tests/rpc/main.cpp
+PATH_TEST_SRC_UMQT = $(CURDIR)/tests/transport/umqt.cpp
 
 # INC
-INC_SRC = -I $(CURDIR)/src
-INC_CPP = -I $(CURDIR)/src/cpp
+INC_CPP = -I $(CURDIR)/src
 INC_INCLUDE = -L /usr/include
 INC_JSONCPP = -I /usr/include/jsoncpp/json
 
-INC = ${INC_SRC} ${INC_CPP} ${INC_INCLUDE} ${INC_JSONCPP}
+INC = ${INC_CPP} ${INC_INCLUDE} ${INC_JSONCPP}
 
 # LINK
+LINK_NATIVE = -Lnative/target/release -larnelify_broker -Wl,-rpath,native/target/release
 LINK_JSONCPP = -ljsoncpp
-LINK = ${LINK_JSONCPP}
+LINK = ${LINK_NATIVE} ${LINK_JSONCPP}
 
-# SCRIPTS
 build:
+	clear && cd native \
+	&& cargo build --release \
+	&& cd ..
+
+test_rpc:
 	clear && mkdir -p build && rm -rf build/*
-	${ENGINE_BUILD} ${ENGINE_FLAGS} ${INC} ${LINK} -fPIC -shared ${PATH_SRC} -o ${PATH_BIN}
+	${ENGINE_WATCH} $(ENGINE_FLAGS) ${INC} $(PATH_TEST_SRC_RPC) ${LINK} -o $(PATH_TEST_BIN) && $(PATH_TEST_BIN)
 
-test:
-	clear && mkdir -p src/tests/bin && rm -rf src/tests/bin/*
-	${ENGINE_WATCH} $(ENGINE_FLAGS) $(PATH_TESTS_SRC) ${INC} ${LINK} -o $(PATH_TESTS_BIN) && $(PATH_TESTS_BIN)
+test_umqt:
+	clear && mkdir -p build && rm -rf build/*
+	${ENGINE_WATCH} $(ENGINE_FLAGS) ${INC} $(PATH_TEST_SRC_UMQT) ${LINK} -o $(PATH_TEST_BIN) && $(PATH_TEST_BIN)
 
-.PHONY: build test
+.PHONY: \
+	build \
+	test_rpc \
+	test_umqt
