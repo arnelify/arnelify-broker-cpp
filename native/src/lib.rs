@@ -22,7 +22,7 @@
 
 //! <img src="https://static.wikia.nocookie.net/arnelify/images/c/c8/Arnelify-logo-2024.png/revision/latest?cb=20240701012515" style="width:336px;" alt="Arnelify Logo" />
 //!
-//! ![Arnelify Broker for Rust](https://img.shields.io/badge/Arnelify%20Broker%20for%20Rust-0.9.6-yellow)
+//! ![Arnelify Broker for Rust](https://img.shields.io/badge/Arnelify%20Broker%20for%20Rust-0.9.7-yellow)
 //! ![Rust](https://img.shields.io/badge/Rust-1.91.1-orange)
 //! ![Cargo](https://img.shields.io/badge/Cargo-1.91.1-blue)
 //!
@@ -174,7 +174,7 @@
 //!
 //! # Release Notes
 //!
-//! Version 0.9.6 — a multi-language broker with RPC and UMQT support.
+//! Version 0.9.7 — a multi-language broker with RPC and UMQT support.
 //!
 //! We are excited to introduce the Arnelify Broker for Rust! Please note that this version is raw and still in active development.
 //!

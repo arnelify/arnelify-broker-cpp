@@ -241,7 +241,7 @@ impl RPCReq {
 }
 
 pub struct RPCStream {
-  cb_send: Arc<dyn Fn(Vec<u8>) + Send + Sync>,
+  cb_send: Arc<dyn Fn(&str, Vec<u8>) + Send + Sync>,
   topic: String,
   request_id: u128,
 }
@@ -249,15 +249,15 @@ pub struct RPCStream {
 impl RPCStream {
   pub fn new() -> Self {
     Self {
-      cb_send: Arc::new(|bytes: Vec<u8>| {
-        println!("{:?}", bytes);
+      cb_send: Arc::new(|topic: &str, bytes: Vec<u8>| {
+        println!("{} {:?}", topic, bytes);
       }),
       topic: String::new(),
       request_id: 0,
     }
   }
 
-  pub fn on_send(&mut self, cb: Arc<dyn Fn(Vec<u8>) + Send + Sync>) -> () {
+  pub fn on_send(&mut self, cb: Arc<dyn Fn(&str, Vec<u8>) + Send + Sync>) -> () {
     self.cb_send = cb;
   }
 
@@ -276,7 +276,7 @@ impl RPCStream {
     buff.extend_from_slice(message.as_bytes());
     buff.extend_from_slice(bytes);
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&self.topic, buff);
   }
 
   pub fn push_bytes(&self, bytes: &[u8], is_reliable: bool) -> () {
@@ -294,7 +294,7 @@ impl RPCStream {
     buff.extend_from_slice(message.as_bytes());
     buff.extend_from_slice(bytes);
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&self.topic, buff);
   }
 
   pub fn push_json(&self, payload: &JSON, is_reliable: bool) -> () {
@@ -311,7 +311,7 @@ impl RPCStream {
     buff.extend_from_slice(meta.as_bytes());
     buff.extend_from_slice(message.as_bytes());
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&self.topic, buff);
   }
 
   pub fn send(
@@ -350,7 +350,7 @@ impl RPCStream {
     buff.extend_from_slice(message.as_bytes());
     buff.extend_from_slice(bytes);
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&req_topic, buff);
 
     rx.recv().unwrap()
   }
@@ -390,7 +390,7 @@ impl RPCStream {
     buff.extend_from_slice(message.as_bytes());
     buff.extend_from_slice(bytes);
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&req_topic, buff);
 
     rx.recv().unwrap()
   }
@@ -429,7 +429,7 @@ impl RPCStream {
     buff.extend_from_slice(meta.as_bytes());
     buff.extend_from_slice(message.as_bytes());
 
-    (self.cb_send)(buff);
+    (self.cb_send)(&req_topic, buff);
 
     rx.recv().unwrap()
   }
@@ -438,7 +438,7 @@ impl RPCStream {
     self.request_id = request_id;
   }
 
-  pub fn set_topic(&mut self, topic: &str) -> () {
+  pub fn set_response_topic(&mut self, topic: &str) -> () {
     self.topic = String::from(topic);
   }
 }
@@ -522,16 +522,15 @@ impl RPC {
           let stream: Arc<Mutex<RPCStream>> = Arc::new(Mutex::new(RPCStream::new()));
           {
             let mut stream_lock: std::sync::MutexGuard<'_, RPCStream> = stream.lock().unwrap();
-            stream_lock.set_topic(&c_res_topic);
+            stream_lock.set_response_topic(&c_res_topic);
             stream_lock.set_request_id(req.get_request_id());
-            let topic_safe: String = c_res_topic.clone();
             let producer_safe: Arc<BrokerProducer> = {
               let producer_lock: std::sync::MutexGuard<'_, Arc<BrokerProducer>> =
                 req_producer.lock().unwrap();
               Arc::clone(&*producer_lock)
             };
 
-            stream_lock.on_send(Arc::new(move |bytes_safe: Vec<u8>| {
+            stream_lock.on_send(Arc::new(move |topic_safe: &str, bytes_safe: Vec<u8>| {
               (producer_safe)(&topic_safe, &bytes_safe);
             }));
           }

@@ -1,6 +1,6 @@
 <img src="https://static.wikia.nocookie.net/arnelify/images/c/c8/Arnelify-logo-2024.png/revision/latest?cb=20240701012515" style="width:336px;" alt="Arnelify Logo" />
 
-![Arnelify Broker for C++](https://img.shields.io/badge/Arnelify%20Broker%20for%20C++-0.9.6-yellow) ![C++](https://img.shields.io/badge/C++-2b-red) ![G++](https://img.shields.io/badge/G++-15.2.0-blue) ![C-Lang](https://img.shields.io/badge/CLang-19.1.7-blue)
+![Arnelify Broker for C++](https://img.shields.io/badge/Arnelify%20Broker%20for%20C++-0.9.7-yellow) ![C++](https://img.shields.io/badge/C++-2b-red) ![G++](https://img.shields.io/badge/G++-15.2.0-blue) ![C-Lang](https://img.shields.io/badge/CLang-19.1.7-blue)
 
 ## 🚀 About
 
@@ -147,7 +147,7 @@ make test_umqt
 ```
 
 ## ⭐ Release Notes
-Version 0.9.6 — a multi-language broker with RPC and UMQT support.
+Version 0.9.7 — a multi-language broker with RPC and UMQT support.
 
 We are excited to introduce the Arnelify Broker for NodeJS! Please note that this version is raw and still in active development.
 
